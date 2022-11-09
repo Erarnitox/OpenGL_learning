@@ -7,7 +7,6 @@ project(
     VERSION 0.1.0
     DESCRIPTION "A project to learn OpenGL with"
     HOMEPAGE_URL "erarnitox.de"
-    LANGUAGES CXX
 )
 
 docs_early_return()
@@ -18,6 +17,15 @@ include(cmake/variables.cmake)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 
+# ---- GLAD library ----
+add_library(
+	glad_lib OBJECT 
+	include/glad/glad.h
+	source/glad.c
+)
+
+target_include_directories(glad_lib PUBLIC include)
+
 # ---- Declare library ----
 
 add_library(
@@ -25,18 +33,23 @@ add_library(
     source/lib.cpp
 )
 
+
 target_include_directories(
     learnopengl_lib ${warning_guard}
     PUBLIC
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>"
 )
 
+
 target_compile_features(learnopengl_lib PUBLIC cxx_std_20)
 
 # ---- Declare executable ----
 
-target_link_libraries(learnopengl_exe PRIVATE glfw)
-target_link_libraries(learnopengl_exe PRIVATE OpenGL::GL)
+add_executable(learnopengl_exe 
+	source/main.cpp
+)
+
+add_executable(learnopengl::exe ALIAS learnopengl_exe)
 
 set_target_properties(
     learnopengl_exe PROPERTIES
@@ -44,11 +57,15 @@ set_target_properties(
     EXPORT_NAME exe
 )
 
+
 target_compile_features(learnopengl_exe PRIVATE cxx_std_20)
 
-target_link_libraries(learnopengl_exe PRIVATE learnopengl_lib)
-add_executable(learnopengl_exe source/main.cpp)
-add_executable(learnopengl::exe ALIAS learnopengl_exe)
+target_link_libraries(learnopengl_exe 
+ 	PUBLIC glfw
+	PUBLIC glad_lib
+	PRIVATE OpenGL::GL
+	PRIVATE learnopengl_lib
+)
 
 # ---- Install rules ----
 
