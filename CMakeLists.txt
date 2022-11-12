@@ -7,6 +7,7 @@ project(
     VERSION 0.1.0
     DESCRIPTION "A project to learn OpenGL with"
     HOMEPAGE_URL "erarnitox.de"
+	LANGUAGES CXX C
 )
 
 docs_early_return()
